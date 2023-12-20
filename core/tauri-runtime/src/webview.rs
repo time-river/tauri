@@ -22,6 +22,7 @@ use std::{fmt, path::PathBuf};
 #[derive(Debug, Clone)]
 pub struct WebviewAttributes {
   pub url: WindowUrl,
+  pub proxy: Option<String>,
   pub user_agent: Option<String>,
   pub initialization_scripts: Vec<String>,
   pub data_directory: Option<PathBuf>,
@@ -50,6 +51,9 @@ impl From<&WindowConfig> for WebviewAttributes {
     if let Some(effects) = &config.window_effects {
       builder = builder.window_effects(effects.clone());
     }
+    if let Some(proxy) = &config.proxy {
+      builder = builder.proxy_config(proxy);
+    }
     builder
   }
 }
@@ -67,6 +71,7 @@ impl WebviewAttributes {
       additional_browser_args: None,
       window_effects: None,
       incognito: false,
+      proxy: None,
     }
   }
 
@@ -133,6 +138,13 @@ impl WebviewAttributes {
   #[must_use]
   pub fn incognito(mut self, incognito: bool) -> Self {
     self.incognito = incognito;
+    self
+  }
+
+  /// Enable proxy for the WebView
+  #[must_use]
+  pub fn proxy_config(mut self, proxy: &str) -> Self {
+    self.proxy = Some(proxy.to_string());
     self
   }
 }
